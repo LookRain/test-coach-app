@@ -1,5 +1,5 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, tool } from "ai";
+import { convertToModelMessages, streamText, tool } from "ai";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
 
@@ -12,10 +12,12 @@ export async function POST(req: Request) {
     apiKey: process.env.OPENROUTER_API_KEY,
   });
 
+  const modelMessages = await convertToModelMessages(messages);
+
   const result = streamText({
     model: openrouter("moonshotai/kimi-k2"),
     system: SYSTEM_PROMPT,
-    messages,
+    messages: modelMessages,
     tools: {
       addTodo: tool({
         description:
